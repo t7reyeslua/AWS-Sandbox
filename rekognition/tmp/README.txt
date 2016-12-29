@@ -1,0 +1,1 @@
+# This directory holds temporary images to be deleted

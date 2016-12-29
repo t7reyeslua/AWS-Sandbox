@@ -4,6 +4,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 import aws_client
 import rekognition_api as rekognition
+import image_processing as image_processing
 from pprint import pprint as pp
 
 def get_args():
@@ -63,3 +64,13 @@ if __name__ == '__main__':
         if args.collection_id and args.source_image:
             res = rekognition.search_faces_by_image(client, args.source_image, args.collection_id,
                                                     face_match_threshold=args.confidence_threshold)
+    # Custom operations ======================================================
+    elif args.action in ['search_all_faces_by_image', 'saf']:
+        if args.source_image:
+            res = rekognition.detect_faces(client, args.source_image)
+            face_image_urls = image_processing.create_face_crops(args.source_image, res.get('FaceDetails', []))
+            if args.collection_id:
+                for face_image_url in face_image_urls:
+                    res = rekognition.search_faces_by_image(client, face_image_url, args.collection_id,
+                                                            face_match_threshold=args.confidence_threshold)
+            image_processing.delete_picture_files(face_image_urls)
