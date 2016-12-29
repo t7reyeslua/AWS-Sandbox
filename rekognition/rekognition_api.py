@@ -117,7 +117,7 @@ def search_faces(client, face_id, collection_id, max_faces=10, face_match_thresh
     pp(response)
     return response
 
-def search_faces_by_image(client, image_url, collection_id, max_faces=10, face_match_threshold=50.0):
+def search_faces_by_image(client, image_url, collection_id, max_faces=10, face_match_threshold=80.0):
     print('%s.search_faces_by_image of image: %s' % (client.api_name, image_url))
     response = None
     with open(image_url, 'rb') as image:

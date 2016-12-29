@@ -14,7 +14,7 @@ def get_args():
     parser.add_argument('-c', '--collection_id')
     parser.add_argument('-f', '--face_id')
     parser.add_argument('-x', '--external_image_id')
-    parser.add_argument('-z', '--confidence_threshold', default=80.0)
+    parser.add_argument('-z', '--confidence_threshold', type=float, default=80.0)
     return parser.parse_args()
 
 if __name__ == '__main__':
@@ -48,14 +48,18 @@ if __name__ == '__main__':
             res = rekognition.detect_faces(client, args.source_image)
     elif args.action in ['detect_labels', 'dtl']:
         if args.source_image:
-            res = rekognition.detect_labels(client, args.source_image)
+            res = rekognition.detect_labels(client, args.source_image,
+                                            min_confidence=args.confidence_threshold)
     elif args.action in ['compare_faces', 'cpf']:
         if args.source_image and args.target_image:
-            res = rekognition.compare_faces(client, args.source_image, args.target_image)
+            res = rekognition.compare_faces(client, args.source_image, args.target_image,
+                                            similarity_threshold=args.confidence_threshold)
     # Storage operations ===========================================================
     elif args.action in ['search_faces', 'sf']:
         if args.collection_id and args.face_id:
-            res = rekognition.search_faces(client, args.face_id, args.collection_id)
+            res = rekognition.search_faces(client, args.face_id, args.collection_id,
+                                           face_match_threshold=args.confidence_threshold)
     elif args.action in ['search_faces_by_image', 'sfi']:
         if args.collection_id and args.source_image:
-            res = rekognition.search_faces_by_image(client, args.source_image, args.collection_id)
+            res = rekognition.search_faces_by_image(client, args.source_image, args.collection_id,
+                                                    face_match_threshold=args.confidence_threshold)
