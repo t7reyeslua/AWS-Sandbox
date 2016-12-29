@@ -36,11 +36,15 @@ def list_collections(client, max_results=100):
 
 
 # FACES MANAGEMENT =======================================================================================
-def index_faces(client, image_url, collection_id):
+def index_faces(client, image_url, collection_id, external_image_id=None):
     print('%s.index_faces of image %s in collection: %s' % (client.api_name, image_url, collection_id))
     response = None
     with open(image_url, 'rb') as image:
-        response = client.api.index_faces(Image={'Bytes': image.read()}, CollectionId=collection_id)
+        if external_image_id is None:
+            response = client.api.index_faces(Image={'Bytes': image.read()}, CollectionId=collection_id)
+        else:
+            response = client.api.index_faces(Image={'Bytes': image.read()}, CollectionId=collection_id,
+                                              ExternalImageId=external_image_id)
         pp(response)
     return response
 
@@ -113,7 +117,7 @@ def search_faces(client, face_id, collection_id, max_faces=10, face_match_thresh
     pp(response)
     return response
 
-def search_faces_by_image(client, image_url, collection_id, max_faces=10, face_match_threshold=80.0):
+def search_faces_by_image(client, image_url, collection_id, max_faces=10, face_match_threshold=50.0):
     print('%s.search_faces_by_image of image: %s' % (client.api_name, image_url))
     response = None
     with open(image_url, 'rb') as image:

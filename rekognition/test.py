@@ -13,6 +13,7 @@ def get_args():
     parser.add_argument('-s', '--source_image')
     parser.add_argument('-c', '--collection_id')
     parser.add_argument('-f', '--face_id')
+    parser.add_argument('-x', '--external_image_id')
     parser.add_argument('-z', '--confidence_threshold', default=80.0)
     return parser.parse_args()
 
@@ -33,7 +34,8 @@ if __name__ == '__main__':
     # Faces =======================================================================
     elif args.action in ['index_faces', 'if']:
         if args.collection_id and args.source_image:
-            res = rekognition.index_faces(client, args.source_image, args.collection_id)
+            res = rekognition.index_faces(client, args.source_image, args.collection_id,
+                                          external_image_id=args.external_image_id)
     elif args.action in ['delete_faces', 'df']:
         if args.collection_id and args.face_id:
             res = rekognition.delete_faces(client, [args.face_id], args.collection_id)
