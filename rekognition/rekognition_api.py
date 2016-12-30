@@ -77,7 +77,7 @@ def index_faces_directory(client, directory, collection_id, external_image_id=No
             continue # skip non-image files
 
         # Index face in this picture
-        image_url = directory + filename
+        image_url = directory + '/' + filename
         response = index_faces(client, image_url, collection_id, external_image_id=external_image_id)
         responses.append(response)
 
@@ -171,11 +171,14 @@ def search_faces_by_image(client, image_url, collection_id, max_faces=10, face_m
     print('%s.search_faces_by_image of image: %s' % (client.api_name, image_url))
     response = None
     with open(image_url, 'rb') as image:
-        response = client.api.search_faces_by_image(
-            Image={'Bytes': image.read()},
-            CollectionId=collection_id,
-            MaxFaces=max_faces,
-            FaceMatchThreshold=face_match_threshold)
+        try:
+            response = client.api.search_faces_by_image(
+                Image={'Bytes': image.read()},
+                CollectionId=collection_id,
+                MaxFaces=max_faces,
+                FaceMatchThreshold=face_match_threshold)
+        except Exception:
+            response = {'FaceMatches': []}
         pp(response)
     return response
 
