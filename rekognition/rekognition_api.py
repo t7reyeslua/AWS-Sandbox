@@ -1,4 +1,5 @@
 from pprint import pprint as pp
+import image_processing as image_processing
 
 # COLLECTIONS MANAGEMENT ==================================================================================
 def create_collection(client, collection_id):
@@ -127,4 +128,28 @@ def search_faces_by_image(client, image_url, collection_id, max_faces=10, face_m
             MaxFaces=max_faces,
             FaceMatchThreshold=face_match_threshold)
         pp(response)
+    return response
+
+def search_all_faces_by_image(client, image_url, collection_id, max_faces=10, face_match_threshold=80.0):
+    print('%s.search_all_faces_by_image of image: %s' % (client.api_name, image_url))
+    response = None
+    faces_recognized = []
+    res = detect_faces(client, image_url)
+    face_image_urls = image_processing.create_face_crops(image_url, res.get('FaceDetails', []))
+
+    for face_image_url in face_image_urls:
+        res = search_faces_by_image(client, face_image_url, collection_id,
+                                    face_match_threshold=face_match_threshold)
+        res['FaceMatches'] = sorted(res['FaceMatches'], key=lambda k: k['Similarity'], reverse=True)
+        face = res['FaceMatches'][:1]
+        if len(face) > 0:
+            face = face[0]
+        else:
+            face = {}
+        face['ImageUrl'] = face_image_url
+        faces_recognized.append(face)
+
+    pp(faces_recognized)
+    image_processing.delete_picture_files(face_image_urls)
+
     return response
