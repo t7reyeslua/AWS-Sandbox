@@ -1,7 +1,12 @@
 import cv2
 import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+from config_handler import config
+import datetime
 
+take_screenshot = False
+tmp_folder = config.get('rekognition', 'tmp_folder', fallback='')
 dirname = os.path.dirname(os.path.realpath(__file__))
 cascPath = dirname + '/haarcascade_frontalface_default.xml'
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -30,6 +35,12 @@ while rval:
     for (x, y, w, h) in faces:
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
+    if take_screenshot:
+        take_screenshot = False
+        now_str = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
+        screenshot = '%s%s_%s.jpg' % (tmp_folder, 'screenshot', now_str)
+        cv2.imwrite(screenshot, frame)  # save image
+
     # Display the resulting frame
     cv2.imshow('Video', frame)
 
@@ -38,7 +49,7 @@ while rval:
     if key == 1048603:  # exit on ESC
         break
     elif key == 1048691:  # 's' screenshot
-        pass
+        take_screenshot = True
 
 # When everything is done, release the capture
 video_capture.release()
