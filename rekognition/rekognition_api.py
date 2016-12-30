@@ -101,7 +101,7 @@ def delete_faces_by_external_image_id(client, external_image_id, collection_id):
     for face in faces:
         if external_image_id in face.get('ExternalImageId', ''):
             face_ids.append(face.get('ImageId', ''))
-            
+
     response = client.api.delete_faces(CollectionId=collection_id, FaceIds=face_ids)
     pp(response)
     return response
@@ -187,7 +187,7 @@ def search_all_faces_by_image(client, image_url, collection_id, max_faces=10, fa
     face_details = res.get('FaceDetails', [])
     face_image_urls = image_processing.create_face_crops(image_url, face_details)
 
-    for face_image_url in face_image_urls:
+    for i, face_image_url in enumerate(face_image_urls):
         res = search_faces_by_image(client, face_image_url, collection_id,
                                     face_match_threshold=face_match_threshold)
         res['FaceMatches'] = sorted(res['FaceMatches'], key=lambda k: k['Similarity'], reverse=True)
@@ -197,6 +197,8 @@ def search_all_faces_by_image(client, image_url, collection_id, max_faces=10, fa
         else:
             face = {}
         face['ImageUrl'] = face_image_url
+        face['FaceDetails'] = face_details[i]
+        face['FaceDetails'].pop('Landmarks', None)
         faces_recognized.append(face)
 
     pp(faces_recognized)
