@@ -12,6 +12,7 @@ def get_args():
     parser.add_argument('-a', '--action', help='Call to be performed', required=True)
     parser.add_argument('-t', '--target_image')
     parser.add_argument('-s', '--source_image')
+    parser.add_argument('-d', '--source_directory')
     parser.add_argument('-c', '--collection_id')
     parser.add_argument('-f', '--face_id')
     parser.add_argument('-x', '--external_image_id')
@@ -37,9 +38,16 @@ if __name__ == '__main__':
         if args.collection_id and args.source_image:
             res = rekognition.index_faces(client, args.source_image, args.collection_id,
                                           external_image_id=args.external_image_id)
+    elif args.action in ['index_faces_directory', 'ifd']:
+        if args.collection_id and args.source_directory:
+            res = rekognition.index_faces_directory(client, args.source_directory, args.collection_id,
+                                                    external_image_id=args.external_image_id)
     elif args.action in ['delete_faces', 'df']:
         if args.collection_id and args.face_id:
             res = rekognition.delete_faces(client, [args.face_id], args.collection_id)
+    elif args.action in ['delete_faces_by_external_image_id', 'dfe']:
+        if args.collection_id and args.external_image_id:
+            res = rekognition.delete_faces(client, args.external_image_id, args.collection_id)
     elif args.action in ['list_faces', 'lf']:
         if args.collection_id:
             res = rekognition.list_faces(client, args.collection_id)

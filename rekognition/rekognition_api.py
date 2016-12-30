@@ -1,6 +1,7 @@
 from pprint import pprint as pp
 import image_processing as image_processing
 import datetime
+import os
 
 # COLLECTIONS MANAGEMENT ==================================================================================
 def create_collection(client, collection_id):
@@ -55,6 +56,36 @@ def index_faces(client, image_url, collection_id, external_image_id=None):
         pp(response)
     return response
 
+def index_faces_directory(client, directory, collection_id, external_image_id=None):
+    '''
+    Indexes all faces from all pictures found in the given directory.  As with the original index_faces
+    it is recommended that each image only contains one single face so it can be easily identified later by
+    using the external_image_id. If two persons appear on same picture, then both will be marked with same eid
+    and will not be possible to distinguish between them. If no external_image_id is received, then the
+    name of the directory will be used. Therefore, it is recommended to name the directory with the name of the
+    person in the pictures to be indexed.
+
+    '''
+    print('%s.index_faces_directory of %s in collection: %s' % (client.api_name, directory, collection_id))
+    responses = []
+    directory = directory.rstrip('/') # Get rid of trailing slash if exists
+    if external_image_id is None:
+        external_image_id = directory.split('/')[-1]
+    indexed_pictures_folder = directory + '/indexed/'
+    for filename in os.listdir(directory):
+        if not (filename.lower().endswith('.png') or filename.lower().endswith('.jpg')):
+            continue # skip non-image files
+
+        # Index face in this picture
+        image_url = directory + filename
+        response = index_faces(client, image_url, collection_id, external_image_id=external_image_id)
+        responses.append(response)
+
+        # Move picture to other folder to mark it as indexed
+        os.makedirs(indexed_pictures_folder, exist_ok=True)
+        os.rename(image_url, indexed_pictures_folder + filename)
+
+    return responses
 
 def delete_faces(client, face_ids, collection_id):
     print('%s.delete_faces %s in collection: %s' % (client.api_name, face_ids, collection_id))
@@ -62,6 +93,18 @@ def delete_faces(client, face_ids, collection_id):
     pp(response)
     return response
 
+def delete_faces_by_external_image_id(client, external_image_id, collection_id):
+    print('%s.delete_faces_by_external_image_id %s in collection: %s' % (client.api_name, external_image_id, collection_id))
+    face_ids = []
+
+    faces = list_faces(client, collection_id)
+    for face in faces:
+        if external_image_id in face.get('ExternalImageId', ''):
+            face_ids.append(face.get('ImageId', ''))
+            
+    response = client.api.delete_faces(CollectionId=collection_id, FaceIds=face_ids)
+    pp(response)
+    return response
 
 def list_faces(client, collection_id, max_results=100):
     print('%s.list_faces in collection: %s' % (client.api_name, collection_id))
