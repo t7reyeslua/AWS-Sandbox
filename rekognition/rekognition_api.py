@@ -1,5 +1,6 @@
 from pprint import pprint as pp
 import image_processing as image_processing
+import datetime
 
 # COLLECTIONS MANAGEMENT ==================================================================================
 def create_collection(client, collection_id):
@@ -44,6 +45,11 @@ def index_faces(client, image_url, collection_id, external_image_id=None):
         if external_image_id is None:
             response = client.api.index_faces(Image={'Bytes': image.read()}, CollectionId=collection_id)
         else:
+            # Make sure the external image id has a fc_ prefix and has a unique suffix
+            now_str = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d%H%M%S%f')
+            external_image_id = external_image_id + '_' + now_str
+            if 'fc_' not in external_image_id:
+                external_image_id = 'fc_' + external_image_id
             response = client.api.index_faces(Image={'Bytes': image.read()}, CollectionId=collection_id,
                                               ExternalImageId=external_image_id)
         pp(response)
