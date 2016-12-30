@@ -9,6 +9,7 @@ take_screenshot = False
 tmp_folder = config.get('rekognition', 'tmp_folder', fallback='')
 dirname = os.path.dirname(os.path.realpath(__file__))
 frames_without_faces = -1
+new_face_detected_start = -1
 
 cascPath = dirname + '/haarcascade_frontalface_default.xml'
 faceCascade = cv2.CascadeClassifier(cascPath)
@@ -37,13 +38,21 @@ while rval:
     for (x, y, w, h) in faces:
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
+    # Detect if at least one face is detected
     if len(faces) == 0:
         frames_without_faces = frames_without_faces + 1
         print(frames_without_faces)
     else:
         if frames_without_faces > 20:
-            take_screenshot = True
+            new_face_detected_start = 0
         frames_without_faces = 0
+
+    # Wait x frames after new face is detected to take the screenshot
+    if new_face_detected_start > - 1:
+        new_face_detected_start = new_face_detected_start + 1
+    if new_face_detected_start == 5:
+        new_face_detected_start = -1
+        take_screenshot = True
 
     if take_screenshot:
         take_screenshot = False
