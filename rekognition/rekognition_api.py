@@ -135,7 +135,8 @@ def search_all_faces_by_image(client, image_url, collection_id, max_faces=10, fa
     response = None
     faces_recognized = []
     res = detect_faces(client, image_url)
-    face_image_urls = image_processing.create_face_crops(image_url, res.get('FaceDetails', []))
+    face_details = res.get('FaceDetails', [])
+    face_image_urls = image_processing.create_face_crops(image_url, face_details)
 
     for face_image_url in face_image_urls:
         res = search_faces_by_image(client, face_image_url, collection_id,
@@ -151,5 +152,5 @@ def search_all_faces_by_image(client, image_url, collection_id, max_faces=10, fa
 
     pp(faces_recognized)
     image_processing.delete_picture_files(face_image_urls)
-
+    image_processing.show_face_names_on_image(image_url, face_details, faces_recognized)
     return response

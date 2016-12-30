@@ -1,4 +1,6 @@
 from PIL import Image
+from PIL import ImageFont
+from PIL import ImageDraw
 import os
 import datetime
 from config_handler import config
@@ -53,4 +55,32 @@ def delete_picture_file(file_url):
 def delete_picture_files(file_urls):
     for file_url in file_urls:
         delete_picture_file(file_url)
+    return
+
+def show_face_names_on_image(original_image_url, face_details, face_matches):
+    original_image = Image.open(original_image_url)
+    draw = ImageDraw.Draw(original_image)
+    fontname = '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-B.ttf'
+    font = ImageFont.truetype(fontname, 16)
+    for k, face_detail in enumerate(face_details):
+        name = face_matches[k].get('Face',{}).get('ExternalImageId','fc_unknown').split('_')[1]
+        similarity = str(int(face_matches[k].get('Similarity', 0.0)))
+        text = '%s - %s' % (name, similarity)
+
+        width_px = original_image.size[0]
+        height_px = original_image.size[1]
+
+        bounding_box = face_detail.get('BoundingBox')
+        top = bounding_box.get('Top', 0.0) * 1.0
+        left = bounding_box.get('Left', 0.0) * 1.0
+
+        if top < 0.0:
+            top = 0.0
+        if left < 0.0:
+            left = 0.0
+
+        left_px = left * width_px
+        top_px = top * height_px
+        draw.text((int(left_px), int(top_px)), text, (255, 255, 255), font=font)
+    original_image.show()
     return
