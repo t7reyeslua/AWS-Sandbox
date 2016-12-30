@@ -60,7 +60,8 @@ def delete_picture_files(file_urls):
 def show_face_names_on_image(original_image_url, face_details, face_matches):
     original_image = Image.open(original_image_url)
     draw = ImageDraw.Draw(original_image)
-    fontname = '/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-B.ttf'
+    tmp_folder = config.get('rekognition', 'tmp_folder', fallback='')
+    fontname = tmp_folder + 'Ubuntu-B.ttf'
     font = ImageFont.truetype(fontname, 16)
     for k, face_detail in enumerate(face_details):
         name = face_matches[k].get('Face',{}).get('ExternalImageId','fc_unknown').split('_')[1]
