@@ -206,5 +206,5 @@ def search_all_faces_by_image(client, image_url, collection_id, max_faces=10, fa
 
     pp(faces_recognized)
     image_processing.delete_picture_files(face_image_urls)
-    image_processing.show_face_names_on_image(image_url, face_details, faces_recognized)
-    return response
+    #image_processing.show_face_names_on_image(image_url, face_details, faces_recognized)
+    return faces_recognized
