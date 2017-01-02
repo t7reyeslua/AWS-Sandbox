@@ -50,3 +50,7 @@ These instructions were tested in an Ubuntu 16.04 installation for Python 3.5.2
       sudo make install
       sudo ldconfig
   ```
+5. Install watchdog:
+   ```
+   pip3 install watchdog
+   ```

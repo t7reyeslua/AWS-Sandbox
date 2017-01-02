@@ -10,7 +10,7 @@ from queue import Queue, Empty
 
 take_screenshot = False
 
-class Webcam(threading.Thread):
+class ScreenshotGrabber(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
@@ -55,7 +55,13 @@ class Webcam(threading.Thread):
             take_screenshot = False
             now_str = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
             screenshot = '%s%s_%s.jpg' % (self.tmp_folder, 'screenshot', now_str)
+            print('Taking screenshot...')
             cv2.imwrite(screenshot, frame)  # save image
+        return
+
+    def force_screenshot(self):
+        global take_screenshot
+        take_screenshot = True
         return
 
     def key_grabber(self):
@@ -111,5 +117,5 @@ class Webcam(threading.Thread):
         self.capture_video()
 
 if __name__ == "__main__":
-    webcam = Webcam()
-    webcam.start()
+    screenshot_grabber = ScreenshotGrabber()
+    screenshot_grabber.start()

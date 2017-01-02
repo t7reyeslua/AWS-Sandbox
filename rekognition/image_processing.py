@@ -42,7 +42,7 @@ def create_face_crops(original_image_url, face_details):
     now_str = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
     tmp_folder = config.get('rekognition', 'tmp_folder', fallback='')
     for k, face_detail in enumerate(face_details):
-        filename = '%s%s_%s.jpg' % (tmp_folder, now_str, str(k))
+        filename = '%sface_crop_%s_%s.jpg' % (tmp_folder, now_str, str(k))
         detected_face_image = create_crop(original_image, face_detail.get('BoundingBox'), filename)
         face_images_urls.append(detected_face_image)
     return face_images_urls
