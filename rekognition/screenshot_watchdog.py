@@ -9,6 +9,7 @@ import threading
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 import aws_client
+import mqtt_client
 import rekognition_api as rekognition
 from multiprocessing import Pool
 from pprint import pprint as pp
@@ -25,6 +26,7 @@ class MyHandler(PatternMatchingEventHandler):
         self.client = aws_client.get_client('rekognition', verify=True)
         self.last_modification = None
         self.last_file = None
+        self.mqttc = mqtt_client.MQTT_Client(name='ScreenshotWatchdogPub', subscribe_default=False)
         return
 
     def process(self, event):

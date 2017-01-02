@@ -7,6 +7,7 @@ import datetime
 from multiprocessing.pool import ThreadPool
 import threading
 from queue import Queue, Empty
+import mqtt_client
 
 take_screenshot = False
 
@@ -21,6 +22,7 @@ class ScreenshotGrabber(threading.Thread):
 
         self.cascPath = self.dirname + '/haarcascade_frontalface_default.xml'
         self.faceCascade = cv2.CascadeClassifier(self.cascPath)
+        self.mqttc = mqtt_client.MQTT_Client(name='ScreenshotGrabberSub')
 
     def check_video_capture(self):
         self.video_capture = cv2.VideoCapture(0)

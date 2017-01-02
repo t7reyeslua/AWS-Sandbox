@@ -50,7 +50,17 @@ These instructions were tested in an Ubuntu 16.04 installation for Python 3.5.2
       sudo make install
       sudo ldconfig
   ```
-5. Install watchdog:
+5. Install watchdog for polling for new screenshot taken:
    ```
-   pip3 install watchdog
+      pip3 install watchdog
+   ```
+6. Install MQTT server:
+   ```
+      sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
+      sudo apt-get update
+      sudo apt-get install mosquitto mosquitto-clients
+   ```
+7. Install MQTT python package:
+   ```
+      pip3 install paho-mqtt
    ```
