@@ -13,6 +13,7 @@ import mqtt_client
 import rekognition_api as rekognition
 from multiprocessing import Pool
 from pprint import pprint as pp
+import json
 
 def timeout(seconds):
     print(datetime.datetime.now(), 'Timeout', seconds, 'seconds')
@@ -72,6 +73,7 @@ class MyHandler(PatternMatchingEventHandler):
         res = rekognition.search_all_faces_by_image(self.client, image_url, collection_id, face_match_threshold=face_match_threshold)
         print(datetime.datetime.now(), 'Results:')
         pp(res)
+        self.mqttc.publish_msg(json.dumps(res))
         return
 
 class ScreenshotWatchdog(threading.Thread):

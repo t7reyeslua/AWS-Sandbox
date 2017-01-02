@@ -74,6 +74,35 @@ class ScreenshotGrabber(threading.Thread):
             take_screenshot = True
         return key
 
+    def write_text_on_image(self, frame):
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        faces = [{}]
+        if self.mqttc.last_message is not None:
+            faces = self.mqttc.last_message
+        y = 15
+        dy = 12
+        for face in faces:
+            faceMatch = face.get('Face', {})
+            faceDetails = face.get('FaceDetails', {})
+
+            name = faceMatch.get('ExternalImageId', 'fc_unknown').split('_')[1]
+            similarity = str(int(face.get('Similarity', 0.0)))
+            username = 'name: %s - %s' % (name, similarity)
+
+            gender = 'gender: '  + faceDetails.get('Gender', {}).get('Value', 'undefined')
+            emotions = faceDetails.get('Emotions', [])
+            main_emotion = 'emotion: undefined - 0'
+            if len(emotions) > 0:
+                main_emotion = 'emotion: ' + emotions[0]['Type'] + ' - ' + str(int(emotions[0]['Confidence']))
+            cv2.putText(frame, username, (5, y), font, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
+            y = y + dy
+            cv2.putText(frame, gender, (5, y), font, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
+            y = y + dy
+            cv2.putText(frame, main_emotion, (5, y), font, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
+            y = y + dy
+            cv2.putText(frame, '_____________', (5, y), font, 0.4, (255, 255, 255), 1, cv2.LINE_AA)
+        return
+
     def capture_video(self):
         global take_screenshot
         rval  = self.check_video_capture()
@@ -100,6 +129,7 @@ class ScreenshotGrabber(threading.Thread):
             for (x, y, w, h) in faces:
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
+            self.write_text_on_image(frame)
             # Display the resulting frame
             cv2.imshow('Video', frame)
 
