@@ -54,13 +54,14 @@ These instructions were tested in an Ubuntu 16.04 installation for Python 3.5.2
    ```
       pip3 install watchdog
    ```
-6. Install MQTT server:
-   ```
+6. Install MQTT dependencies:
+  * Add MQTT serve repository and install
+  ```
       sudo apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
       sudo apt-get update
       sudo apt-get install mosquitto mosquitto-clients
    ```
-7. Install MQTT python package:
+  * Install MQTT python package
    ```
       pip3 install paho-mqtt
    ```
