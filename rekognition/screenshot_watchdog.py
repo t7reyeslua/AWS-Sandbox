@@ -70,7 +70,14 @@ class MyHandler(PatternMatchingEventHandler):
     def request_screenshot_analysis(self, image_url, collection_id=None, face_match_threshold=80.0):
         if not collection_id:
             collection_id = config.get('rekognition', 'default_collection', fallback='col_reyeslua')
-        res = rekognition.search_all_faces_by_image(self.client, image_url, collection_id, face_match_threshold=face_match_threshold)
+        face_analysis_type = config.get('rekognition', 'face_analysis_type', fallback='default')
+        if face_analysis_type == 'all':
+            res = rekognition.search_all_faces_by_image(self.client, image_url, collection_id, face_match_threshold=face_match_threshold)
+        else:
+            res1 = rekognition.search_faces_by_image(self.client, image_url, collection_id, face_match_threshold=face_match_threshold)
+            res = res1.get('FaceMatches', [])
+            res[0]['FaceDetails'] = {}
+
         print(datetime.datetime.now(), 'Results:')
         pp(res)
         self.mqttc.publish_msg(json.dumps(res))
